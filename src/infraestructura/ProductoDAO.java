@@ -27,15 +27,15 @@ public class ProductoDAO {
      */
     public void guardar(Producto producto) throws SQLException {
         // La consulta SQL inserta un nuevo registro en la tabla PRODUCTOS
-        // Se añade "stock" a la lista de columnas y a los valores a insertar.
+        // Se añade 'stock' a la lista de columnas y a los valores a insertar.
         String sql = "INSERT INTO PRODUCTOS (nombre, precio_unitario, activo, creado, stock) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
             stmt.setString(1, producto.getNombre());
             stmt.setDouble(2, producto.getPrecio());
             stmt.setBoolean(3, producto.isActivo());
-            // Convierte LocalDateTime a Timestamp para la base de datos
+            // Convertir LocalDateTime a Timestamp para la base de datos
             stmt.setTimestamp(4, Timestamp.valueOf(producto.getCreado()));
-            stmt.setInt(5, producto.getStock()); // Establece el valor del stock
+            stmt.setInt(5, producto.getStock()); // Nuevo: Establece el valor del stock
             stmt.executeUpdate();
         }
     }
@@ -47,6 +47,7 @@ public class ProductoDAO {
      */
     public List<Producto> listarTodos() throws SQLException {
         List<Producto> productos = new ArrayList<>();
+        // Asegúrate de seleccionar la columna 'stock' también
         String sql = "SELECT id, nombre, precio_unitario, activo, creado, stock FROM PRODUCTOS";
         try (Statement stmt = conexion.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -58,7 +59,7 @@ public class ProductoDAO {
                     rs.getBoolean("activo"),
                     // Convertir Timestamp a LocalDateTime
                     rs.getTimestamp("creado").toLocalDateTime(),
-                    rs.getInt("stock") //  Obtiene la cantidad del stock
+                    rs.getInt("stock") // Nuevo: Obtiene el valor del stock
                 );
                 productos.add(producto);
             }
@@ -107,7 +108,7 @@ public class ProductoDAO {
             stmt.setString(1, producto.getNombre());
             stmt.setDouble(2, producto.getPrecio());
             stmt.setBoolean(3, producto.isActivo());
-            stmt.setInt(4, producto.getStock()); // Actualiza el valor del stock
+            stmt.setInt(4, producto.getStock()); // Nuevo: Actualiza el valor del stock
             stmt.setInt(5, producto.getId());
             stmt.executeUpdate();
         }
@@ -124,6 +125,22 @@ public class ProductoDAO {
         try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
             stmt.setBoolean(1, estado);
             stmt.setInt(2, id);
+            stmt.executeUpdate();
+        }
+    }
+
+    /**
+     * Actualiza el stock de un producto en la base de datos.
+     * Este método es llamado después de una venta para reducir el stock.
+     * @param productId El ID del producto a actualizar.
+     * @param quantitySold La cantidad vendida (se resta del stock).
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public void actualizarStockProducto(int productId, int quantitySold) throws SQLException {
+        String sql = "UPDATE productos SET stock = stock - ? WHERE id = ?";
+        try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+            stmt.setInt(1, quantitySold);
+            stmt.setInt(2, productId);
             stmt.executeUpdate();
         }
     }

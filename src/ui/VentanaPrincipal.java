@@ -116,7 +116,15 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             new String [] {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(tblProductos);
 
         jLabel1.setText("Consultar producto según nombre");
@@ -287,7 +295,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        JOptionPane.showMessageDialog(this, "Sistema caja para cafeteria univertisaria. Realizado por Sebastián Benavides",
+        JOptionPane.showMessageDialog(this, "Sistema caja para cafeteria universitaria. Realizado por Sebastián Benavides",
                  "Acerca de",
                  JOptionPane.INFORMATION_MESSAGE);
         // TODO add your handling code here:

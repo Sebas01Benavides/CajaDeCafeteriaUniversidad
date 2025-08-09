@@ -1,14 +1,15 @@
 package ui;
 import dominio.Producto;
-import dominio.DetalleVenta;
 import dominio.Venta;
+import dominio.DetalleVenta;
 import servicio.ProductoServicio;
 import servicio.VentaServicio;
-import java.sql.SQLException;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
 /**
  *
  * @author Sebas
@@ -17,6 +18,7 @@ public class RealizarVentaUI extends javax.swing.JFrame {
     private ProductoServicio productoServicio;
     private VentaServicio ventaServicio;
     private List<DetalleVenta> carrito;
+    private DefaultTableModel carritoModel;
     /**
      * Creates new form RealizarVentaUI
      */
@@ -25,58 +27,71 @@ public class RealizarVentaUI extends javax.swing.JFrame {
         this.productoServicio = new ProductoServicio();
         this.ventaServicio = new VentaServicio();
         this.carrito = new ArrayList<>();
-        cargarProductosDisponibles();
         inicializarTablaCarrito();
+        cargarProductosEnTabla(); // Cargar los productos al iniciar la ventana
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
     
-    private void cargarProductosDisponibles() {
-        DefaultTableModel model = (DefaultTableModel) tblProductos.getModel();
-        model.setRowCount(0);
+     /**
+     * Carga todos los productos de la base de datos en la tabla tblProductos.
+     */
+     private void cargarProductosEnTabla() {
         try {
             List<Producto> productos = productoServicio.listarTodos();
-            for (Producto p : productos) {
+            DefaultTableModel model = (DefaultTableModel) tblProductos.getModel();
+            model.setRowCount(0); // Limpiar la tabla
+
+            // Asignar nombres a las columnas y número de columnas correcto
+            model.setColumnIdentifiers(new Object[]{"ID", "Nombre", "Precio", "Activo", "Stock"});
+
+            for (Producto producto : productos) {
                 model.addRow(new Object[]{
-                    p.getId(), 
-                    p.getNombre(), 
-                    p.getPrecio()
+                    producto.getId(),
+                    producto.getNombre(),
+                    producto.getPrecio(),
+                    producto.isActivo() ? "Activo" : "Inactivo", // Mostrar el estado como texto
+                    producto.getStock()
                 });
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al cargar productos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error al cargar los productos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
     
     /**
      * Inicializa la tabla del carrito.
+     * Asigna el DefaultTableModel a la variable de instancia 'carritoModel'.
      */
     private void inicializarTablaCarrito() {
-        DefaultTableModel model = new DefaultTableModel(
+        // Asigna el nuevo DefaultTableModel a la variable de instancia 'this.carritoModel'
+        this.carritoModel = new DefaultTableModel(
             new Object[]{"ID", "Nombre", "Cantidad", "Precio Unit.", "Total"}, 0
         );
-        tblCarrito.setModel(model);
+        tblCarrito.setModel(this.carritoModel); // Establece este modelo en la JTable
     }
     
     /**
      * Actualiza la tabla del carrito y los campos de totales.
      */
     private void actualizarCarrito() {
-        DefaultTableModel model = (DefaultTableModel) tblCarrito.getModel();
-        model.setRowCount(0);
+        // Usa la variable de instancia 'carritoModel'
+        carritoModel.setRowCount(0); 
         double subtotal = 0;
         
         for (DetalleVenta detalle : carrito) {
-            model.addRow(new Object[]{
+            carritoModel.addRow(new Object[]{ // Usa la variable de instancia 'carritoModel'
                 detalle.getProductId(),
                 detalle.getNombreProducto(),
                 detalle.getCantidad(),
-                detalle.getPrecioUnit(),
-                detalle.getTotalLinea()
+                String.format("%.2f", detalle.getPrecioUnit()), // Formatear precio unitario
+                String.format("%.2f", detalle.getTotalLinea()) // Formatear total línea
             });
             subtotal += detalle.getTotalLinea();
         }
         
         // Actualizar los campos de texto
-        double iva = subtotal * 0.13;
+        double iva = subtotal * 0.13; // Considera IVI si es diferente, o usar constantes del servicio
         double total = subtotal + iva;
         
         txtSubtotal.setText(String.format("%.2f", subtotal));
@@ -121,7 +136,15 @@ public class RealizarVentaUI extends javax.swing.JFrame {
             new String [] {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(tblProductos);
 
         tblCarrito.setModel(new javax.swing.table.DefaultTableModel(
@@ -134,7 +157,15 @@ public class RealizarVentaUI extends javax.swing.JFrame {
             new String [] {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane2.setViewportView(tblCarrito);
 
         jLabel1.setText("Productos");
@@ -161,7 +192,7 @@ public class RealizarVentaUI extends javax.swing.JFrame {
             }
         });
 
-        btnQuitarDelCarrito.setText("Procesar venta");
+        btnQuitarDelCarrito.setText("Quitar del carrito");
         btnQuitarDelCarrito.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnQuitarDelCarritoActionPerformed(evt);
@@ -185,27 +216,22 @@ public class RealizarVentaUI extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnAgregarAlCarrito)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnQuitarDelCarrito)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnProcesarVenta)
+                        .addGap(147, 147, 147)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(btnAgregarAlCarrito)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnQuitarDelCarrito)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnProcesarVenta)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(56, 56, 56)))
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtIVA, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
                             .addComponent(txtSubtotal, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtIVA, javax.swing.GroupLayout.DEFAULT_SIZE, 393, Short.MAX_VALUE)
                             .addComponent(txtTotal, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
@@ -228,7 +254,7 @@ public class RealizarVentaUI extends javax.swing.JFrame {
                     .addComponent(btnQuitarDelCarrito)
                     .addComponent(btnProcesarVenta))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -276,27 +302,41 @@ public class RealizarVentaUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnQuitarDelCarritoActionPerformed
 
     private void btnProcesarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProcesarVentaActionPerformed
-        if (carrito.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "No hay productos en el carrito para procesar la venta.", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-    
-    try {
-        // Asume que el usuario que realiza la venta tiene el ID 1 por ahora
+        if (carrito.isEmpty()) { // Usar la lista 'carrito' que es la fuente de verdad
+            JOptionPane.showMessageDialog(this, "El carrito está vacío. Agregue productos antes de procesar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // El ID de usuario se pasaría de la VentanaPrincipal
+        // Por ahora, usaremos un ID de usuario de prueba (ej: 1)
         int userId = 1; 
-        // Se crea el objeto Venta con la lista de productos en el carrito
-        Venta nuevaVenta = new Venta(userId, carrito);
-        // Se llama al servicio para procesar la venta y guardar en BD
-        int ventaId = ventaServicio.procesarVenta(nuevaVenta);
-        JOptionPane.showMessageDialog(this, "Venta procesada con éxito. ID de Venta: " + ventaId);
-        // Se limpian los campos y las tablas para una nueva venta
-        carrito.clear();
-        // Llama al método que ya existe para actualizar el carrito y los totales
-        actualizarCarrito(); 
-    } catch (SQLException e) {
-        // Se maneja el error de la base de datos
-        JOptionPane.showMessageDialog(this, "Error al guardar la venta: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    }
+
+        Venta venta = new Venta(userId, LocalDateTime.now(), carrito); // Usar la lista 'carrito'
+
+        try {
+            int ventaId = ventaServicio.procesarVenta(venta);
+            venta.setId(ventaId); // Asignar el ID generado por la BD
+
+            // Actualizar stock de productos en la BD después de una venta exitosa
+            for (DetalleVenta detalle : carrito) {
+                productoServicio.actualizarStockProducto(detalle.getProductId(), detalle.getCantidad());
+            }
+            
+            // Aquí se crea y se muestra la nueva ventana de la factura
+            GenerarFacturaUI facturaUI = new GenerarFacturaUI(this, true, venta); 
+            facturaUI.setVisible(true);
+
+            JOptionPane.showMessageDialog(this, "Venta procesada con éxito. ID: " + ventaId, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            
+            // Limpiar el carrito después de la venta exitosa
+            carrito.clear(); // Limpiar la lista del carrito
+            actualizarCarrito(); // Refrescar la tabla del carrito (la vaciará)
+            cargarProductosEnTabla(); // Recargar productos para actualizar el stock visible desde la BD
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al procesar la venta: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_btnProcesarVentaActionPerformed
 
     /**

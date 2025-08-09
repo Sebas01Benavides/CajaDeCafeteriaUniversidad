@@ -1,12 +1,15 @@
 package ui;
 import dominio.Venta;
-import dominio.DetalleVenta; // Necesario para mostrar los detalles si se implementa
-import servicio.VentaServicio;
+import dominio.DetalleVenta; // Asegúrate de importar DetalleVenta
+import servicio.VentaServicio; 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.event.ListSelectionEvent; // Importar para el listener de selección de tabla
+import javax.swing.event.ListSelectionListener; // Importar para el listener de selección de tabla
 import java.util.List;
 import java.sql.SQLException;
-import java.time.LocalDate; // Para trabajar con fechas
+import java.time.LocalDate; 
+import java.time.format.DateTimeFormatter;
 /**
  *
  * @author Sebas
@@ -18,27 +21,50 @@ public class ConsultarVentasUI extends javax.swing.JFrame {
      * Creates new form ConsultarVentas
      */
     public ConsultarVentasUI() {
+        this.ventaServicio = new VentaServicio();
         initComponents();
         cargarVentasDelDia(); // Cargar las ventas al iniciar
-
-    }
-private void cargarVentasDelDia() {
-        DefaultTableModel model = (DefaultTableModel) tblVentas.getModel();
-        model.setRowCount(0); // Limpiar la tabla
+        setLocationRelativeTo(null); 
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Cerrar solo esta ventana al hacer clic en la x
         
-        // Definir los nombres de las columnas para el modelo de la tabla
+        tblVentas.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                // Asegurarse de que el evento no sea el de ajuste (cuando se selecciona y deselecciona)
+                // y de que realmente haya una fila seleccionada.
+                if (!e.getValueIsAdjusting() && tblVentas.getSelectedRow() != -1) {
+                    int selectedRow = tblVentas.getSelectedRow();
+                    // El ID de la venta está en la primera columna (índice 0)
+                    int ventaId = (int) tblVentas.getValueAt(selectedRow, 0);
+                    cargarDetallesDeVenta(ventaId);
+                } else if (tblVentas.getSelectedRow() == -1) {
+                    // Si no hay fila seleccionada, limpiar la tabla de detalles
+                    DefaultTableModel detallesModel = (DefaultTableModel) tblDetallesVenta.getModel();
+                    detallesModel.setRowCount(0);
+                }
+            }
+        });
+    }
+    
+    /**
+     * Carga las ventas del día actual en la tabla principal.
+     */
+    private void cargarVentasDelDia() {
+        DefaultTableModel model = (DefaultTableModel) tblVentas.getModel();
+        model.setRowCount(0); 
+        
         model.setColumnIdentifiers(new Object[]{"ID Venta", "Fecha/Hora", "Usuario ID", "Subtotal", "IVA", "IVI", "Descuento", "Total"});
         
         try {
-            // Obtenemos las ventas del día. Necesitaremos un método en VentaServicio para esto.
             List<Venta> ventas = ventaServicio.listarVentasPorFecha(LocalDate.now()); 
-            
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
             for (Venta venta : ventas) {
                 model.addRow(new Object[]{
                     venta.getId(),
-                    venta.getFechaHora(),
+                    venta.getFechaHora().format(formatter), 
                     venta.getUserId(),
-                    String.format("%.2f", venta.getSubtotal()),
+                    String.format("%.2f", venta.getSubtotal()), 
                     String.format("%.2f", venta.getImpuestoIVA()),
                     String.format("%.2f", venta.getImpuestoIVI()),
                     String.format("%.2f", venta.getDescuento()),
@@ -52,6 +78,33 @@ private void cargarVentasDelDia() {
     }
 
     /**
+     * Carga los detalles de una venta específica en la tabla de detalles.
+     * @param ventaId El ID de la venta cuyos detalles se quieren cargar.
+     */
+    private void cargarDetallesDeVenta(int ventaId) {
+        DefaultTableModel detallesModel = (DefaultTableModel) tblDetallesVenta.getModel();
+        detallesModel.setRowCount(0); // Limpiar la tabla de detalles
+        
+        detallesModel.setColumnIdentifiers(new Object[]{"ID Producto", "Nombre Producto", "Cantidad", "Precio Unitario", "Total Línea"});
+        
+        try {
+            List<DetalleVenta> detalles = ventaServicio.obtenerDetallesDeVenta(ventaId);
+            
+            for (DetalleVenta detalle : detalles) {
+                detallesModel.addRow(new Object[]{
+                    detalle.getProductId(),
+                    detalle.getNombreProducto(), 
+                    detalle.getCantidad(),
+                    String.format("%.2f", detalle.getPrecioUnit()),
+                    String.format("%.2f", detalle.getTotalLinea())
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar detalles de la venta: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+    /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
@@ -62,8 +115,12 @@ private void cargarVentasDelDia() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         tblVentas = new javax.swing.JTable();
+        btnActualizarVentas = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblDetallesVenta = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Consultar ventas");
 
         tblVentas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -78,19 +135,43 @@ private void cargarVentasDelDia() {
         ));
         jScrollPane1.setViewportView(tblVentas);
 
+        btnActualizarVentas.setText("Actualizar ventas");
+
+        tblDetallesVenta.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(tblDetallesVenta);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 25, Short.MAX_VALUE))
+                .addContainerGap()
+                .addComponent(btnActualizarVentas)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jScrollPane1)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 495, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 366, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 25, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnActualizarVentas)
+                .addGap(0, 31, Short.MAX_VALUE))
         );
 
         pack();
@@ -133,7 +214,10 @@ private void cargarVentasDelDia() {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnActualizarVentas;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable tblDetallesVenta;
     private javax.swing.JTable tblVentas;
     // End of variables declaration//GEN-END:variables
 }

@@ -79,4 +79,15 @@ public class ProductoServicio {
     public void cambiarEstado(int id, boolean estado) throws SQLException {
         productoDAO.cambiarEstado(id, estado);
     }
+
+    /**
+     * Actualiza el stock de un producto en la base de datos.
+     * Este método es llamado después de una venta para reducir el stock.
+     * @param productId El ID del producto a actualizar.
+     * @param quantitySold La cantidad vendida (se resta del stock).
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public void actualizarStockProducto(int productId, int quantitySold) throws SQLException {
+        productoDAO.actualizarStockProducto(productId, quantitySold);
+    }
 }

@@ -7,23 +7,39 @@ import java.util.List;
  */
 public class Venta {
     private int id;
-    private int userId;
-    private LocalDateTime fechaHora;
+    private int userId; // ID del usuario que realizó la venta
+    private LocalDateTime fechaHora; // Fecha y hora de la venta
+    private List<DetalleVenta> detalles; // Lista de productos vendidos
     private double subtotal;
-    private double impuestoIVA;
-    private double impuestoIVI;
+    private double impuestoIVA; // Impuesto de Valor Agregado
+    private double impuestoIVI; // Impuesto de Valor Incluido (si aplica, según tu diseño)
     private double descuento;
     private double total;
-    private List<DetalleVenta> detalles;
-    
-    // Constructor para crear una nueva venta
-    public Venta(int userId, List<DetalleVenta> detalles) {
+
+    // Constructor completo para crear una Venta desde la base de datos
+    public Venta(int id, int userId, LocalDateTime fechaHora, double subtotal, double impuestoIVA, double impuestoIVI, double descuento, double total) {
+        this.id = id;
         this.userId = userId;
-        this.detalles = detalles;
-        this.fechaHora = LocalDateTime.now();
-        // Los cálculos se realizarán en el servicio
+        this.fechaHora = fechaHora;
+        this.subtotal = subtotal;
+        this.impuestoIVA = impuestoIVA;
+        this.impuestoIVI = impuestoIVI;
+        this.descuento = descuento;
+        this.total = total;
+        // Los detalles no se cargan aquí, se cargan por separado con VentaDAO
+        this.detalles = null; 
     }
 
+    // Constructor para crear una nueva Venta desde la aplicación (con detalles)
+    // Este constructor es el que se usa en RealizarVentaUI
+    public Venta(int userId, LocalDateTime fechaHora, List<DetalleVenta> detalles) { 
+        this.userId = userId;
+        this.fechaHora = fechaHora;
+        this.detalles = detalles;
+        // Los demás campos (subtotal, impuestos, descuento, total) se calculan en el servicio
+    }
+
+    // Getters
     public int getId() {
         return id;
     }
@@ -34,6 +50,10 @@ public class Venta {
 
     public LocalDateTime getFechaHora() {
         return fechaHora;
+    }
+
+    public List<DetalleVenta> getDetalles() {
+        return detalles;
     }
 
     public double getSubtotal() {
@@ -56,10 +76,7 @@ public class Venta {
         return total;
     }
 
-    public List<DetalleVenta> getDetalles() {
-        return detalles;
-    }
-
+    // Setters
     public void setId(int id) {
         this.id = id;
     }
@@ -70,6 +87,10 @@ public class Venta {
 
     public void setFechaHora(LocalDateTime fechaHora) {
         this.fechaHora = fechaHora;
+    }
+
+    public void setDetalles(List<DetalleVenta> detalles) {
+        this.detalles = detalles;
     }
 
     public void setSubtotal(double subtotal) {
@@ -91,10 +112,4 @@ public class Venta {
     public void setTotal(double total) {
         this.total = total;
     }
-
-    public void setDetalles(List<DetalleVenta> detalles) {
-        this.detalles = detalles;
-    }
-    
-    
 }

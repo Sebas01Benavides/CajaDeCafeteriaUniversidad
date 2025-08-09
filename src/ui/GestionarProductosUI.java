@@ -15,6 +15,7 @@ public class GestionarProductosUI extends javax.swing.JFrame {
         initComponents();
         this.productoServicio = new ProductoServicio();
         cargarTablaProductos();
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
     private ProductoServicio productoServicio;
     

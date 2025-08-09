@@ -5,6 +5,7 @@
 package ui;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
 /**
  *
@@ -22,7 +23,7 @@ public class CalculadoraUI extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
         setIconImage(new ImageIcon(getClass().getResource("/imagenes/icono.png")).getImage());
-        // Inicializa el JTextField
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         txtCalculadora.setText("0");
     }
     private String formatResult(double result) {

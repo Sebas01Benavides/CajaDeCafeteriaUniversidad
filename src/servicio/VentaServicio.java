@@ -60,4 +60,8 @@ public class VentaServicio {
         // Asume que VentaDAO tendrá un método similar para filtrar por fecha
         return ventaDAO.listarVentasPorFecha(fecha);
     }
+    public List<DetalleVenta> obtenerDetallesDeVenta(int ventaId) throws SQLException {
+        // Este método simplemente delega la llamada al VentaDAO
+        return ventaDAO.obtenerDetallesDeVenta(ventaId);
+    }
 }
