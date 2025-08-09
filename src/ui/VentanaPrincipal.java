@@ -31,16 +31,24 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
         jMenuBarGestionarProductos = new javax.swing.JMenuBar();
         jMenuArchivo = new javax.swing.JMenu();
+        jMenu5 = new javax.swing.JMenu();
         jMenuProducto = new javax.swing.JMenu();
         jMenu1 = new javax.swing.JMenu();
         jMenuVentas = new javax.swing.JMenu();
+        jMenu2 = new javax.swing.JMenu();
         jMenuHerramientas = new javax.swing.JMenu();
+        jMenu3 = new javax.swing.JMenu();
         jMenuAyuda = new javax.swing.JMenu();
+        jMenu4 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sistema Cafeteria");
 
         jMenuArchivo.setText("Archivo");
+
+        jMenu5.setText("Salir");
+        jMenuArchivo.add(jMenu5);
+
         jMenuBarGestionarProductos.add(jMenuArchivo);
 
         jMenuProducto.setText("Producto");
@@ -51,12 +59,24 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jMenuBarGestionarProductos.add(jMenuProducto);
 
         jMenuVentas.setText("Ventas");
+
+        jMenu2.setText("Realizar venta");
+        jMenuVentas.add(jMenu2);
+
         jMenuBarGestionarProductos.add(jMenuVentas);
 
         jMenuHerramientas.setText("Herramientas");
+
+        jMenu3.setText("Calculadora");
+        jMenuHerramientas.add(jMenu3);
+
         jMenuBarGestionarProductos.add(jMenuHerramientas);
 
         jMenuAyuda.setText("Ayuda");
+
+        jMenu4.setText("Contacto");
+        jMenuAyuda.add(jMenu4);
+
         jMenuBarGestionarProductos.add(jMenuAyuda);
 
         setJMenuBar(jMenuBarGestionarProductos);
@@ -111,6 +131,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenuArchivo;
     private javax.swing.JMenu jMenuAyuda;
     private javax.swing.JMenuBar jMenuBarGestionarProductos;

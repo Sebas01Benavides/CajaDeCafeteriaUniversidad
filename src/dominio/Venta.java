@@ -1,8 +1,6 @@
 package dominio;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 /**
  *
  * @author Sebas
@@ -17,6 +15,14 @@ public class Venta {
     private double descuento;
     private double total;
     private List<DetalleVenta> detalles;
+    
+    // Constructor para crear una nueva venta
+    public Venta(int userId, List<DetalleVenta> detalles) {
+        this.userId = userId;
+        this.detalles = detalles;
+        this.fechaHora = LocalDateTime.now();
+        // Los cálculos se realizarán en el servicio
+    }
 
     public int getId() {
         return id;
@@ -89,6 +95,6 @@ public class Venta {
     public void setDetalles(List<DetalleVenta> detalles) {
         this.detalles = detalles;
     }
-
+    
     
 }

@@ -5,39 +5,27 @@ package dominio;
  * @author Sebas
  */
 public class DetalleVenta {
-    private int id;
-    private int ventaId;
     private int productId;
+    private String nombreProducto; // Necesario para mostrarlo en la UI
     private int cantidad;
     private double precioUnit;
     private double totalLinea;
-    
-    public DetalleVenta(int id, int ventaId, int productId, int cantidad, double precioUnit, double totalLinea) {
-        this.id = id;
-        this.ventaId = ventaId;
+
+    // Constructor para la interfaz
+    public DetalleVenta(int productId, String nombreProducto, int cantidad, double precioUnit) {
         this.productId = productId;
-        this.cantidad = cantidad;
-        this.precioUnit = precioUnit;
-        this.totalLinea = totalLinea;
-    }
-    
-    public DetalleVenta(int productId, int cantidad, double precioUnit) {
-        this.productId = productId;
+        this.nombreProducto = nombreProducto;
         this.cantidad = cantidad;
         this.precioUnit = precioUnit;
         this.totalLinea = cantidad * precioUnit;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public int getVentaId() {
-        return ventaId;
-    }
-
     public int getProductId() {
         return productId;
+    }
+
+    public String getNombreProducto() {
+        return nombreProducto;
     }
 
     public int getCantidad() {
@@ -52,16 +40,12 @@ public class DetalleVenta {
         return totalLinea;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setVentaId(int ventaId) {
-        this.ventaId = ventaId;
-    }
-
     public void setProductId(int productId) {
         this.productId = productId;
+    }
+
+    public void setNombreProducto(String nombreProducto) {
+        this.nombreProducto = nombreProducto;
     }
 
     public void setCantidad(int cantidad) {
