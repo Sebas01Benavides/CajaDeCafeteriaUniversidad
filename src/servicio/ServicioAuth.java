@@ -13,46 +13,51 @@ import java.sql.SQLException;
  * @author Sebas
  */
 public class ServicioAuth {
-    private UsuarioDAO usuarioDAO;
+    private final UsuarioDAO usuarioDAO;
+
     public ServicioAuth() {
         this.usuarioDAO = new UsuarioDAO();
     }
+
     /**
-     * Valida las credenciales de un usuario.
-     * @param username El nombre de usuario.
-     * @param password La contraseña en texto plano.
-     * @return El objeto Usuario si las credenciales son correctas, o null si fallan.
+     * Autentica a un usuario verificando su nombre y contraseña.
+     * @param username El nombre de usuario ingresado.
+     * @param password La contraseña ingresada por el usuario.
+     * @return Un objeto Usuario si la autenticación es exitosa, de lo contrario, null.
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     * @throws NoSuchAlgorithmException Si el algoritmo de encriptación no está disponible.
      */
     public Usuario login(String username, String password) throws SQLException, NoSuchAlgorithmException {
-        Usuario usuarioDB = usuarioDAO.buscarPorUsername(username);
+        // 1. Busca el usuario en la base de datos usando el DAO
+        Usuario usuario = usuarioDAO.buscarPorUsername(username);
 
-        // Si el usuario no existe o está inactivo
-        if (usuarioDB == null || !usuarioDB.isActivo()) {
-            return null;
+        if (usuario != null) {
+            // 2. Encripta la contraseña ingresada por el usuario
+            String passwordHashIngresado = encriptarPassword(password);
+            
+            // 3. Compara el hash de la contraseña ingresada con el hash de la base de datos
+            if (usuario.getPassword().equals(passwordHashIngresado)) {
+                // Si coinciden, devuelve el objeto Usuario
+                return usuario;
+            }
         }
-
-        // Encriptar la contraseña proporcionada y compararla con el hash almacenado en la BD
-        String passwordHash = generarHashSHA256(password);
-        if (passwordHash.equals(usuarioDB.getPassword())) {
-            // Aquí se podría registrar un suceso de login exitoso en la tabla LOGS
-            return usuarioDB;
-        } else {
-            // Aquí se podría registrar un suceso de login fallido en la tabla LOGS
-            return null;
-        }
+        
+        // Si no se encuentra el usuario o las contraseñas no coinciden, devuelve null
+        return null;
     }
-    
+
     /**
-     * Genera un hash SHA-256 para una cadena de texto.
-     * @param texto El texto a encriptar.
-     * @return El hash SHA-256 en formato String.
+     * Encripta una contraseña usando el algoritmo SHA-256.
+     * @param password La contraseña a encriptar.
+     * @return El hash de la contraseña en formato hexadecimal.
+     * @throws NoSuchAlgorithmException Si el algoritmo SHA-256 no está disponible.
      */
-    private String generarHashSHA256(String texto) throws NoSuchAlgorithmException {
+    private String encriptarPassword(String password) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(texto.getBytes());
-        byte[] digest = md.digest();
+        md.update(password.getBytes());
+        byte[] bytes = md.digest();
         StringBuilder sb = new StringBuilder();
-        for (byte b : digest) {
+        for (byte b : bytes) {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();

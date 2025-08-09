@@ -13,19 +13,12 @@ import java.util.Date;
 public class Usuario {
     private int id;
     private String username;
-    private String password; // Se guardará el hash SHA-256 aquí
-    private String rol;
-    private boolean activo;
-    private Date creado;
-    
-    public Usuario (){} //Constructor vacio
-    
-    public Usuario(String username, String password, String rol) {
+    private String password;
+
+    public Usuario(int id, String username, String password) {
+        this.id = id;
         this.username = username;
         this.password = password;
-        this.rol = rol;
-        this.activo = true;
-        this.creado = new Date();
     }
 
     public int getId() {
@@ -40,18 +33,6 @@ public class Usuario {
         return password;
     }
 
-    public String getRol() {
-        return rol;
-    }
-
-    public boolean isActivo() {
-        return activo;
-    }
-
-    public Date getCreado() {
-        return creado;
-    }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -63,17 +44,6 @@ public class Usuario {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public void setRol(String rol) {
-        this.rol = rol;
-    }
-
-    public void setActivo(boolean activo) {
-        this.activo = activo;
-    }
-
-    public void setCreado(Date creado) {
-        this.creado = creado;
-    }
     
-    }
+    
+}

@@ -12,44 +12,32 @@ import java.util.Date;
 
 
 public class UsuarioDAO {
-    
-    // Método para buscar un usuario por su nombre de usuario
-    public Usuario buscarPorUsername(String username) throws SQLException {
-        String sql = "SELECT id, username, password, rol, activo, creado FROM USUARIOS WHERE username = ? AND activo = true";
-        
-        try (Connection conn = ConexionDB.obtenerConexion();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setString(1, username);
-            ResultSet rs = pstmt.executeQuery();
+    private final Connection conexion;
 
-            if (rs.next()) {
-                Usuario usuario = new Usuario();
-                usuario.setId(rs.getInt("id"));
-                usuario.setUsername(rs.getString("username"));
-                usuario.setPassword(rs.getString("password")); // Aquí se obtiene el hash
-                usuario.setRol(rs.getString("rol"));
-                usuario.setActivo(rs.getBoolean("activo"));
-                usuario.setCreado(rs.getDate("creado"));
-                return usuario;
+    public UsuarioDAO() {
+        this.conexion = ConexionBD.getInstancia().getConexion();
+    }
+
+    /**
+     * Busca un usuario en la base de datos por su nombre de usuario.
+     *
+     * @param username El nombre de usuario a buscar.
+     * @return Un objeto Usuario si se encuentra, de lo contrario, null.
+     * @throws SQLException
+     */
+    public Usuario buscarPorUsername(String username) throws SQLException {
+        String sql = "SELECT id, username, password FROM USUARIOS WHERE username = ? AND activo = 1";
+        
+        try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt("id");
+                    String passwordHash = rs.getString("password");
+                    return new Usuario(id, username, passwordHash);
+                }
             }
         }
         return null;
-    }
-
-    // Método para guardar un nuevo usuario
-    public void guardar(Usuario usuario) throws SQLException {
-        String sql = "INSERT INTO USUARIOS (username, password, rol, activo, creado) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = ConexionDB.obtenerConexion();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setString(1, usuario.getUsername());
-            pstmt.setString(2, usuario.getPassword());
-            pstmt.setString(3, usuario.getRol());
-            pstmt.setBoolean(4, usuario.isActivo());
-            pstmt.setTimestamp(5, new java.sql.Timestamp(usuario.getCreado().getTime()));
-            
-            pstmt.executeUpdate();
-        }
     }
 }

@@ -6,37 +6,46 @@ package dominio;
  */
 public class DetalleVenta {
     private int id;
-    private Venta venta; // Relación con la clase Venta
-    private Producto producto; // Relación con la clase Producto
+    private int ventaId;
+    private int productId;
     private int cantidad;
-    private double precioUnitario;
+    private double precioUnit;
     private double totalLinea;
-
-    public DetalleVenta(Producto producto, int cantidad) {
-        this.producto = producto;
+    
+    public DetalleVenta(int id, int ventaId, int productId, int cantidad, double precioUnit, double totalLinea) {
+        this.id = id;
+        this.ventaId = ventaId;
+        this.productId = productId;
         this.cantidad = cantidad;
-        this.precioUnitario = producto.getPrecio();
-        this.totalLinea = this.precioUnitario * this.cantidad;
+        this.precioUnit = precioUnit;
+        this.totalLinea = totalLinea;
+    }
+    
+    public DetalleVenta(int productId, int cantidad, double precioUnit) {
+        this.productId = productId;
+        this.cantidad = cantidad;
+        this.precioUnit = precioUnit;
+        this.totalLinea = cantidad * precioUnit;
     }
 
     public int getId() {
         return id;
     }
 
-    public Venta getVenta() {
-        return venta;
+    public int getVentaId() {
+        return ventaId;
     }
 
-    public Producto getProducto() {
-        return producto;
+    public int getProductId() {
+        return productId;
     }
 
     public int getCantidad() {
         return cantidad;
     }
 
-    public double getPrecioUnitario() {
-        return precioUnitario;
+    public double getPrecioUnit() {
+        return precioUnit;
     }
 
     public double getTotalLinea() {
@@ -47,24 +56,25 @@ public class DetalleVenta {
         this.id = id;
     }
 
-    public void setVenta(Venta venta) {
-        this.venta = venta;
+    public void setVentaId(int ventaId) {
+        this.ventaId = ventaId;
     }
 
-    public void setProducto(Producto producto) {
-        this.producto = producto;
+    public void setProductId(int productId) {
+        this.productId = productId;
     }
 
     public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
     }
 
-    public void setPrecioUnitario(double precioUnitario) {
-        this.precioUnitario = precioUnitario;
+    public void setPrecioUnit(double precioUnit) {
+        this.precioUnit = precioUnit;
     }
 
     public void setTotalLinea(double totalLinea) {
         this.totalLinea = totalLinea;
     }
+    
     
 }

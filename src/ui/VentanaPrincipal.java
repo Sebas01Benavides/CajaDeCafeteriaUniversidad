@@ -9,12 +9,13 @@ package ui;
  * @author Sebas
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
-
     /**
      * Creates new form VentanaPrincipal
      */
     public VentanaPrincipal(String nombreUsuario) {
         initComponents();
+        this.nombreUsuario = nombreUsuario;
+
     }
     
     private String nombreUsuario;
@@ -28,7 +29,37 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenuBarGestionarProductos = new javax.swing.JMenuBar();
+        jMenuArchivo = new javax.swing.JMenu();
+        jMenuProducto = new javax.swing.JMenu();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuVentas = new javax.swing.JMenu();
+        jMenuHerramientas = new javax.swing.JMenu();
+        jMenuAyuda = new javax.swing.JMenu();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Sistema Cafeteria");
+
+        jMenuArchivo.setText("Archivo");
+        jMenuBarGestionarProductos.add(jMenuArchivo);
+
+        jMenuProducto.setText("Producto");
+
+        jMenu1.setText("Gestionar productos");
+        jMenuProducto.add(jMenu1);
+
+        jMenuBarGestionarProductos.add(jMenuProducto);
+
+        jMenuVentas.setText("Ventas");
+        jMenuBarGestionarProductos.add(jMenuVentas);
+
+        jMenuHerramientas.setText("Herramientas");
+        jMenuBarGestionarProductos.add(jMenuHerramientas);
+
+        jMenuAyuda.setText("Ayuda");
+        jMenuBarGestionarProductos.add(jMenuAyuda);
+
+        setJMenuBar(jMenuBarGestionarProductos);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -38,7 +69,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 474, Short.MAX_VALUE)
+            .addGap(0, 451, Short.MAX_VALUE)
         );
 
         pack();
@@ -79,5 +110,12 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenuArchivo;
+    private javax.swing.JMenu jMenuAyuda;
+    private javax.swing.JMenuBar jMenuBarGestionarProductos;
+    private javax.swing.JMenu jMenuHerramientas;
+    private javax.swing.JMenu jMenuProducto;
+    private javax.swing.JMenu jMenuVentas;
     // End of variables declaration//GEN-END:variables
 }

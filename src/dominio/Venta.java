@@ -1,4 +1,5 @@
 package dominio;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
@@ -8,52 +9,24 @@ import java.util.ArrayList;
  */
 public class Venta {
     private int id;
-    private Usuario usuario; // Relación con la clase Usuario
-    private Date fechaHora;
+    private int userId;
+    private LocalDateTime fechaHora;
     private double subtotal;
-    private double impuestoIVA; // IVA del 7%
-    private double impuestoIVI; // IVI del 13%
+    private double impuestoIVA;
+    private double impuestoIVI;
     private double descuento;
     private double total;
-    
-    // Lista para almacenar los ítems de la venta (relación con DetalleVenta)
     private List<DetalleVenta> detalles;
-
-    public Venta(Usuario usuario) {
-        this.usuario = usuario;
-        this.fechaHora = new Date();
-        this.detalles = new ArrayList<>();
-    }
-
-    public void agregarDetalle(DetalleVenta detalle) {
-        this.detalles.add(detalle);
-        // Lógica para recalcular el total de la venta al agregar un detalle
-        recalcularTotales();
-    }
-    
-    public void recalcularTotales() {
-        this.subtotal = 0;
-        for (DetalleVenta detalle : this.detalles) {
-            this.subtotal += detalle.getTotalLinea();
-        }
-
-        // Aplicar impuestos
-        this.impuestoIVA = this.subtotal * 0.07;
-        this.impuestoIVI = this.subtotal * 0.13;
-
-        // Calcular el total
-        this.total = this.subtotal + this.impuestoIVA + this.impuestoIVI - this.descuento;
-    }
 
     public int getId() {
         return id;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public int getUserId() {
+        return userId;
     }
 
-    public Date getFechaHora() {
+    public LocalDateTime getFechaHora() {
         return fechaHora;
     }
 
@@ -85,11 +58,11 @@ public class Venta {
         this.id = id;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public void setFechaHora(Date fechaHora) {
+    public void setFechaHora(LocalDateTime fechaHora) {
         this.fechaHora = fechaHora;
     }
 
@@ -116,4 +89,6 @@ public class Venta {
     public void setDetalles(List<DetalleVenta> detalles) {
         this.detalles = detalles;
     }
+
+    
 }
