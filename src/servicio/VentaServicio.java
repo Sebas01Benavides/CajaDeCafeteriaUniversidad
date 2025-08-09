@@ -3,6 +3,7 @@ import dominio.Venta;
 import dominio.DetalleVenta;
 import infraestructura.VentaDAO;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 /**
  *
@@ -17,6 +18,13 @@ public class VentaServicio {
     public VentaServicio() {
         this.ventaDAO = new VentaDAO();
     }
+
+    /**
+     * Procesa una venta, calcula los totales e impuestos y la guarda en la base de datos.
+     * @param venta El objeto Venta a procesar y guardar.
+     * @return El ID de la venta guardada.
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
     public int procesarVenta(Venta venta) throws SQLException {
         double subtotal = 0;
         for (DetalleVenta detalle : venta.getDetalles()) {
@@ -39,5 +47,17 @@ public class VentaServicio {
         venta.setTotal(total);
 
         return ventaDAO.guardar(venta);
+    }
+
+    /**
+     * Lista todas las ventas registradas para una fecha específica.
+     * Delega la consulta al VentaDAO.
+     * @param fecha La fecha para la que se desean listar las ventas.
+     * @return Una lista de objetos Venta.
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     */
+    public List<Venta> listarVentasPorFecha(LocalDate fecha) throws SQLException {
+        // Asume que VentaDAO tendrá un método similar para filtrar por fecha
+        return ventaDAO.listarVentasPorFecha(fecha);
     }
 }

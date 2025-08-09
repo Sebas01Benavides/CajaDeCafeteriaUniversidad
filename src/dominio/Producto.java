@@ -12,21 +12,28 @@ public class Producto {
     private double precio;
     private boolean activo;
     private LocalDateTime creado;
+    private int stock; // ¡NUEVO CAMPO: Stock!
 
-    public Producto(String nombre, double precio) {
+    // Constructor para crear un nuevo producto (sin ID ni creado, se generan en BD)
+    public Producto(String nombre, double precio, int stock) { 
         this.nombre = nombre;
         this.precio = precio;
-        this.activo = true;
+        this.activo = true; // Por defecto un producto nuevo está activo
+        this.creado = LocalDateTime.now(); // Se asigna la fecha y hora actual
+        this.stock = stock; // Asigna el stock
     }
 
-    public Producto(int id, String nombre, double precio, boolean activo, LocalDateTime creado) {
+    // Constructor para recuperar un producto de la base de datos (con todos los campos)
+    public Producto(int id, String nombre, double precio, boolean activo, LocalDateTime creado, int stock) { // Constructor 
         this.id = id;
         this.nombre = nombre;
         this.precio = precio;
         this.activo = activo;
         this.creado = creado;
+        this.stock = stock; 
     }
 
+    // Getters
     public int getId() {
         return id;
     }
@@ -46,7 +53,12 @@ public class Producto {
     public LocalDateTime getCreado() {
         return creado;
     }
+    
+    public int getStock() { 
+        return stock;
+    }
 
+    // Setters
     public void setId(int id) {
         this.id = id;
     }
@@ -67,5 +79,7 @@ public class Producto {
         this.creado = creado;
     }
     
-    
+    public void setStock(int stock) { 
+        this.stock = stock;
+    }
 }

@@ -1,5 +1,6 @@
 package ui;
 import dominio.Producto;
+import java.time.LocalDateTime;
 import servicio.ProductoServicio;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
@@ -9,32 +10,47 @@ import java.util.List;
  * @author Sebas
  */
 public class GestionarProductosUI extends javax.swing.JFrame {
+    private int productoSeleccionadoId = -1; 
     public GestionarProductosUI() {
         initComponents();
-       this.productoServicio = new ProductoServicio();
+        this.productoServicio = new ProductoServicio();
         cargarTablaProductos();
     }
     private ProductoServicio productoServicio;
     
     private void cargarTablaProductos() {
         DefaultTableModel model = (DefaultTableModel) tblProductos.getModel();
-        model.setRowCount(0);
+        model.setRowCount(0); // Limpiar la tabla
+        
+        // Definir los nombres de las columnas para el modelo de la tabla
+        model.setColumnIdentifiers(new Object[]{"ID", "Nombre", "Precio", "Activo", "Stock"});
 
         try {
             List<Producto> productos = productoServicio.listarTodos();
             for (Producto p : productos) {
                 model.addRow(new Object[]{
-                    p.getId(), 
-                    p.getNombre(), 
-                    p.getPrecio(), 
-                    p.isActivo() ? "Activo" : "Inactivo"
+                    p.getId(),
+                    p.getNombre(),
+                    p.getPrecio(),
+                    p.isActivo() ? "Activo" : "Inactivo", // Mostrar el estado como texto
+                    p.getStock() // Nuevo: Mostrar el stock
                 });
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al cargar productos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
+        // Limpiar campos y resetear selección
+        limpiarCampos();
+        productoSeleccionadoId = -1;
     }
+    
+     private void limpiarCampos() {
+        txtNombreProducto.setText("");
+        txtPrecio.setText("");
+        txtStock.setText("");
+    }
+     
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -54,6 +70,8 @@ public class GestionarProductosUI extends javax.swing.JFrame {
         btnActualizarProducto = new javax.swing.JButton();
         btnActivarProducto = new javax.swing.JButton();
         btnDesactivarProducto = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        txtStock = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -114,6 +132,14 @@ public class GestionarProductosUI extends javax.swing.JFrame {
             }
         });
 
+        jLabel3.setText("Stock");
+
+        txtStock.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtStockActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -123,21 +149,26 @@ public class GestionarProductosUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnAgregarProducto)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnActualizarProducto)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnActivarProducto)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnDesactivarProducto))
-                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(24, 24, 24)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtNombreProducto, javax.swing.GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
-                            .addComponent(txtPrecio))))
+                            .addComponent(txtPrecio)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnAgregarProducto)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnActualizarProducto)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnActivarProducto)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnDesactivarProducto)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(24, 24, 24)
+                        .addComponent(txtStock)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -152,13 +183,17 @@ public class GestionarProductosUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtStock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAgregarProducto)
                     .addComponent(btnActualizarProducto)
                     .addComponent(btnActivarProducto)
                     .addComponent(btnDesactivarProducto))
-                .addGap(0, 18, Short.MAX_VALUE))
+                .addGap(27, 27, 27))
         );
 
         pack();
@@ -176,9 +211,10 @@ public class GestionarProductosUI extends javax.swing.JFrame {
     try {
             String nombre = txtNombreProducto.getText();
             double precio = Double.parseDouble(txtPrecio.getText());
-            
+            int stock = Integer.parseInt(txtStock.getText()); 
+
             // Crea un nuevo objeto Producto y llama al servicio
-            Producto nuevoProducto = new Producto(nombre, precio);
+            Producto nuevoProducto = new Producto(nombre, precio, stock);
             productoServicio.crearProducto(nuevoProducto);
             
             JOptionPane.showMessageDialog(this, "Producto agregado con éxito.");
@@ -194,26 +230,54 @@ public class GestionarProductosUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAgregarProductoActionPerformed
 
     private void btnActualizarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarProductoActionPerformed
-        int filaSeleccionada = tblProductos.getSelectedRow();
-    if (filaSeleccionada == -1) {
-        JOptionPane.showMessageDialog(this, "Selecciona un producto de la tabla para actualizar.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (productoSeleccionadoId == -1) {
+        JOptionPane.showMessageDialog(this, "Selecciona un producto de la tabla para actualizar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
         return;
     }
 
     try {
-        // Obtiene el ID del producto de la fila seleccionada
-        int idProducto = (int) tblProductos.getValueAt(filaSeleccionada, 0);
         String nuevoNombre = txtNombreProducto.getText();
         double nuevoPrecio = Double.parseDouble(txtPrecio.getText());
+        int nuevoStock = Integer.parseInt(txtStock.getText()); // Obtener el nuevo stock desde el campo txtStock
 
-        Producto productoActualizado = new Producto(idProducto, nuevoNombre, nuevoPrecio, true, null); // Ajusta el constructor si es necesario
+        // Validaciones básicas
+        if (nuevoNombre.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El nombre del producto no puede estar vacío.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (nuevoPrecio <= 0) {
+            JOptionPane.showMessageDialog(this, "El precio debe ser un número positivo.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (nuevoStock < 0) { // Validación para el stock
+            JOptionPane.showMessageDialog(this, "El stock no puede ser negativo.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Para actualizar, obtenemos el estado 'activo' actual de la tabla (columna 3, índice 3)
+        // Convertimos el String "Activo" o "Inactivo" a boolean
+        boolean activoActual = ((String) tblProductos.getValueAt(tblProductos.getSelectedRow(), 3)).equals("Activo");
+        
+        // Crea un objeto Producto con los datos actualizados.
+        // Se usa el constructor completo que incluye id, nombre, precio, activo, creado y stock.
+        // Para 'creado', se puede usar LocalDateTime.now() o recuperar el valor original si lo hubieras almacenado.
+        // Aquí asumimos que 'creado' no se actualiza en esta UI, así que se le pasa un valor válido para el constructor.
+        Producto productoActualizado = new Producto(
+            productoSeleccionadoId, 
+            nuevoNombre, 
+            nuevoPrecio, 
+            activoActual, 
+            LocalDateTime.now(), // Pasa LocalDateTime.now() o la fecha original si la recuperas.
+            nuevoStock
+        ); 
+        
         productoServicio.actualizarProducto(productoActualizado);
         
         JOptionPane.showMessageDialog(this, "Producto actualizado con éxito.");
         cargarTablaProductos(); // Recarga la tabla para reflejar los cambios
         
     } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "El precio debe ser un número válido.", "Error de formato", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "El precio y el stock deben ser números válidos.", "Error de formato", JOptionPane.ERROR_MESSAGE);
     } catch (IllegalArgumentException e) {
         JOptionPane.showMessageDialog(this, "Error de validación: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     } catch (Exception e) {
@@ -222,21 +286,40 @@ public class GestionarProductosUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnActualizarProductoActionPerformed
 
     private void btnActivarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActivarProductoActionPerformed
-        int filaSeleccionada = tblProductos.getSelectedRow();
-        if (filaSeleccionada == -1) {
-            JOptionPane.showMessageDialog(this, "Selecciona un producto de la tabla para activar.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         try {
-            int idProducto = (int) tblProductos.getValueAt(filaSeleccionada, 0);
-            productoServicio.cambiarEstado(idProducto, true);
+            String nombre = txtNombreProducto.getText();
+            double precio = Double.parseDouble(txtPrecio.getText());
+            int stock = Integer.parseInt(txtStock.getText()); // Obtener el stock
+
+            // Validaciones básicas
+            if (nombre.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "El nombre del producto no puede estar vacío.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (precio <= 0) {
+                JOptionPane.showMessageDialog(this, "El precio debe ser un número positivo.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+             if (stock < 0) {
+                JOptionPane.showMessageDialog(this, "El stock no puede ser negativo.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             
-            JOptionPane.showMessageDialog(this, "Producto activado con éxito.");
-            cargarTablaProductos();
+            // Crea un nuevo objeto Producto (activo por defecto, fecha de creación actual)
+            Producto nuevoProducto = new Producto(nombre, precio, stock);
+            productoServicio.crearProducto(nuevoProducto);
             
+            JOptionPane.showMessageDialog(this, "Producto agregado con éxito.");
+            cargarTablaProductos(); // Recarga la tabla para reflejar los cambios
+            limpiarCampos();
+            
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "El precio y el stock deben ser números válidos.", "Error de formato", JOptionPane.ERROR_MESSAGE);
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, "Error de validación: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al activar producto: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error al agregar producto: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }//GEN-LAST:event_btnActivarProductoActionPerformed
 
@@ -258,6 +341,10 @@ public class GestionarProductosUI extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Error al desactivar producto: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnDesactivarProductoActionPerformed
+
+    private void txtStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtStockActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtStockActionPerformed
 
     /**
      * @param args the command line arguments
@@ -302,9 +389,11 @@ public class GestionarProductosUI extends javax.swing.JFrame {
     private javax.swing.JButton btnDesactivarProducto;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblProductos;
     private javax.swing.JTextField txtNombreProducto;
     private javax.swing.JTextField txtPrecio;
+    private javax.swing.JTextField txtStock;
     // End of variables declaration//GEN-END:variables
 }
