@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package infraestructura;
 import dominio.Producto;
 import java.sql.Connection;
@@ -15,8 +11,6 @@ import java.util.List;
  *
  * @author Sebas
  */
-
-
 public class ProductoDAO {
 
     public List<Producto> listarTodos() throws SQLException {

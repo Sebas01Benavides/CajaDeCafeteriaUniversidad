@@ -6,8 +6,6 @@ import java.util.ArrayList;
  *
  * @author Sebas
  */
-
-
 public class Venta {
     private int id;
     private Usuario usuario; // Relación con la clase Usuario
