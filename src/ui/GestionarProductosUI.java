@@ -5,6 +5,8 @@ import servicio.ProductoServicio;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
 import java.util.List;
+import java.awt.event.MouseAdapter; 
+import java.awt.event.MouseEvent;
 /**
  *
  * @author Sebas
@@ -16,6 +18,34 @@ public class GestionarProductosUI extends javax.swing.JFrame {
         this.productoServicio = new ProductoServicio();
         cargarTablaProductos();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        tblProductos.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                int filaSeleccionada = tblProductos.getSelectedRow();
+                if (filaSeleccionada != -1) {
+                    // Obtener los datos de la fila seleccionada
+                    // Asegúrate de que la columna 0 siempre sea el ID y sea un int
+                    try {
+                        productoSeleccionadoId = (int) tblProductos.getValueAt(filaSeleccionada, 0);
+                        String nombre = (String) tblProductos.getValueAt(filaSeleccionada, 1);
+                        double precio = (double) tblProductos.getValueAt(filaSeleccionada, 2);
+                        int stock = (int) tblProductos.getValueAt(filaSeleccionada, 4); 
+
+                        // Llenar los campos de texto
+                        txtNombreProducto.setText(nombre);
+                        txtPrecio.setText(String.valueOf(precio));
+                        txtStock.setText(String.valueOf(stock)); 
+                    } catch (ClassCastException e) {
+                        JOptionPane.showMessageDialog(null, "Error al leer datos del producto: tipo de dato inesperado. " + e.getMessage(), "Error Interno", JOptionPane.ERROR_MESSAGE);
+                        e.printStackTrace();
+                        productoSeleccionadoId = -1; // Restablecer selección en caso de error
+                    }
+                } else {
+                    productoSeleccionadoId = -1; // No hay fila seleccionada, resetear ID
+                }
+            }
+        });
     }
     private ProductoServicio productoServicio;
     
@@ -236,12 +266,10 @@ public class GestionarProductosUI extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, "Selecciona un producto de la tabla para actualizar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
         return;
     }
-
     try {
         String nuevoNombre = txtNombreProducto.getText();
         double nuevoPrecio = Double.parseDouble(txtPrecio.getText());
         int nuevoStock = Integer.parseInt(txtStock.getText()); // Obtener el nuevo stock desde el campo txtStock
-
         // Validaciones básicas
         if (nuevoNombre.isEmpty()) {
             JOptionPane.showMessageDialog(this, "El nombre del producto no puede estar vacío.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
@@ -255,16 +283,13 @@ public class GestionarProductosUI extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "El stock no puede ser negativo.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         // Para actualizar, obtenemos el estado 'activo' actual de la tabla (columna 3, índice 3)
         // Convertimos el String "Activo" o "Inactivo" a boolean
         boolean activoActual = ((String) tblProductos.getValueAt(tblProductos.getSelectedRow(), 3)).equals("Activo");
         
         // Crea un objeto Producto con los datos actualizados.
-        // Se usa el constructor completo que incluye id, nombre, precio, activo, creado y stock.
-        // Para 'creado', se puede usar LocalDateTime.now() o recuperar el valor original si lo hubieras almacenado.
-        // Aquí asumimos que 'creado' no se actualiza en esta UI, así que se le pasa un valor válido para el constructor.
-        Producto productoActualizado = new Producto(
+        // Se usa el constructor completo que incluye id, nombre, precio, activo, creado y stock
+            Producto productoActualizado = new Producto(
             productoSeleccionadoId, 
             nuevoNombre, 
             nuevoPrecio, 
@@ -288,40 +313,42 @@ public class GestionarProductosUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btnActualizarProductoActionPerformed
 
     private void btnActivarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActivarProductoActionPerformed
-        try {
-            String nombre = txtNombreProducto.getText();
-            double precio = Double.parseDouble(txtPrecio.getText());
-            int stock = Integer.parseInt(txtStock.getText()); // Obtener el stock
+        // Obtener la fila seleccionada actual del JTable
+        int currentSelectedRow = tblProductos.getSelectedRow();
+        int idToActivate = -1;
 
-            // Validaciones básicas
-            if (nombre.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "El nombre del producto no puede estar vacío.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
-                return;
+        // Si hay una fila seleccionada, intentar obtener el ID del producto
+        if (currentSelectedRow != -1) {
+            try {
+                // El ID del producto está en la columna 0 del modelo de la tabla
+                idToActivate = (int) tblProductos.getValueAt(currentSelectedRow, 0);
+                System.out.println("ID del producto seleccionado al hacer clic en Activar: " + idToActivate);// muestra en consola
+                // ------------------------------------
+            } catch (ClassCastException e) {
+                // Manejar si el valor no es un entero (aunque no debería pasar si cargarTablaProductos es correcta)
+                System.err.println("Error: El ID del producto en la tabla no es un entero. " + e.getMessage());
+                JOptionPane.showMessageDialog(this, "Error interno al obtener el ID del producto. Intente de nuevo.", "Error", JOptionPane.ERROR_MESSAGE);
+                return; // Salir del método si hay un error crítico
             }
-            if (precio <= 0) {
-                JOptionPane.showMessageDialog(this, "El precio debe ser un número positivo.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-             if (stock < 0) {
-                JOptionPane.showMessageDialog(this, "El stock no puede ser negativo.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            
-            // Crea un nuevo objeto Producto (activo por defecto, fecha de creación actual)
-            Producto nuevoProducto = new Producto(nombre, precio, stock);
-            productoServicio.crearProducto(nuevoProducto);
-            
-            JOptionPane.showMessageDialog(this, "Producto agregado con éxito.");
-            cargarTablaProductos(); // Recarga la tabla para reflejar los cambios
-            limpiarCampos();
-            
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "El precio y el stock deben ser números válidos.", "Error de formato", JOptionPane.ERROR_MESSAGE);
-        } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(this, "Error de validación: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        // Si idToActivate sigue siendo -1, significa que no se seleccionó un producto válido
+        if (idToActivate == -1) {
+            JOptionPane.showMessageDialog(this, "Selecciona un producto de la tabla para activar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            // Llama al servicio para cambiar el estado del producto usando el ID obtenido
+            productoServicio.cambiarEstado(idToActivate, true); // Usa idToActivate
+
+            JOptionPane.showMessageDialog(this, "Producto activado con éxito.");
+            cargarTablaProductos(); // Recarga la tabla para reflejar el cambio de estado
+            limpiarCampos(); // Limpiar los campos después de la activación exitosa
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al agregar producto: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al activar producto: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace(); // Imprime el stack trace completo para depuración
         }
     }//GEN-LAST:event_btnActivarProductoActionPerformed
 

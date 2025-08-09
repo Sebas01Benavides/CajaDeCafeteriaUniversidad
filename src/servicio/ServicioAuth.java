@@ -126,7 +126,7 @@ public class ServicioAuth {
             // Se pueden cambiar las credenciales para registrar otro usuario
             Usuario newUser = authService.registrarUsuario("testadmin", "testpass", "admin");
             System.out.println("Usuario '" + newUser.getUsername() + "' registrado con éxito con ID: " + newUser.getId());
-            System.out.println("Por favor, usa 'admin' y 'testpass' para iniciar sesión.");
+            System.out.println("Por favor, usa 'testadmin' y 'testpass' para iniciar sesión.");
         } catch (IllegalArgumentException e) {
             System.out.println("Advertencia: " + e.getMessage());
         } catch (SQLException | NoSuchAlgorithmException e) {
