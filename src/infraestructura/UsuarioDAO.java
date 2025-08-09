@@ -19,25 +19,48 @@ public class UsuarioDAO {
     }
 
     /**
-     * Busca un usuario en la base de datos por su nombre de usuario.
-     *
+     * Busca un usuario por su nombre de usuario.
      * @param username El nombre de usuario a buscar.
-     * @return Un objeto Usuario si se encuentra, de lo contrario, null.
-     * @throws SQLException
+     * @return El objeto Usuario si se encuentra, o null si no existe.
+     * @throws SQLException Si ocurre un error de SQL.
      */
     public Usuario buscarPorUsername(String username) throws SQLException {
-        String sql = "SELECT id, username, password FROM USUARIOS WHERE username = ? AND activo = 1";
-        
+        String sql = "SELECT id, username, password_hash, salt, rol, activo, creado FROM USUARIOS WHERE username = ?";
+        Usuario usuario = null;
         try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
             stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    int id = rs.getInt("id");
-                    String passwordHash = rs.getString("password");
-                    return new Usuario(id, username, passwordHash);
+                    usuario = new Usuario(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("password_hash"),
+                        rs.getString("salt"),
+                        rs.getString("rol"),
+                        rs.getBoolean("activo"),
+                        rs.getTimestamp("creado").toLocalDateTime()
+                    );
                 }
             }
         }
-        return null;
+        return usuario;
     }
-}
+
+    /**
+     * Guarda un nuevo usuario en la base de datos.
+     * @param usuario El objeto Usuario a guardar.
+     * @throws SQLException Si ocurre un error de SQL.
+     */
+    public void guardar(Usuario usuario) throws SQLException {
+        String sql = "INSERT INTO USUARIOS (username, password_hash, salt, rol, activo, creado) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conexion.prepareStatement(sql)) {
+            stmt.setString(1, usuario.getUsername());
+            stmt.setString(2, usuario.getPasswordHash());
+            stmt.setString(3, usuario.getSalt());
+            stmt.setString(4, usuario.getRol());
+            stmt.setBoolean(5, usuario.isActivo());
+            stmt.setTimestamp(6, java.sql.Timestamp.valueOf(usuario.getCreado()));
+            stmt.executeUpdate();
+        }
+    }
+} 

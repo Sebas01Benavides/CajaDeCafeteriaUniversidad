@@ -7,59 +7,124 @@ import dominio.Usuario;
 import infraestructura.UsuarioDAO;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.sql.SQLException;
+import java.util.Base64; // Para codificar el salt a String
 /**
  *
  * @author Sebas
  */
 public class ServicioAuth {
-    private final UsuarioDAO usuarioDAO;
+
+    private UsuarioDAO usuarioDAO;
 
     public ServicioAuth() {
         this.usuarioDAO = new UsuarioDAO();
     }
 
     /**
-     * Autentica a un usuario verificando su nombre y contraseña.
-     * @param username El nombre de usuario ingresado.
-     * @param password La contraseña ingresada por el usuario.
-     * @return Un objeto Usuario si la autenticación es exitosa, de lo contrario, null.
+     * Intenta autenticar a un usuario con el nombre de usuario y la contraseña proporcionados.
+     * Genera un hash de la contraseña ingresada con el salt almacenado y lo compara con el hash guardado.
+     *
+     * @param username El nombre de usuario.
+     * @param password La contraseña en texto plano.
+     * @return El objeto Usuario si la autenticación es exitosa, null en caso contrario.
      * @throws SQLException Si ocurre un error al acceder a la base de datos.
-     * @throws NoSuchAlgorithmException Si el algoritmo de encriptación no está disponible.
+     * @throws NoSuchAlgorithmException Si el algoritmo de hash (SHA-256) no está disponible.
      */
     public Usuario login(String username, String password) throws SQLException, NoSuchAlgorithmException {
-        // 1. Busca el usuario en la base de datos usando el DAO
         Usuario usuario = usuarioDAO.buscarPorUsername(username);
 
-        if (usuario != null) {
-            // 2. Encripta la contraseña ingresada por el usuario
-            String passwordHashIngresado = encriptarPassword(password);
-            
-            // 3. Compara el hash de la contraseña ingresada con el hash de la base de datos
-            if (usuario.getPassword().equals(passwordHashIngresado)) {
-                // Si coinciden, devuelve el objeto Usuario
-                return usuario;
-            }
+        if (usuario == null) {
+            // Usuario no encontrado
+            return null;
         }
+
+        // Recuperar el salt del usuario desde la base de datos
+        String salt = usuario.getSalt();
         
-        // Si no se encuentra el usuario o las contraseñas no coinciden, devuelve null
-        return null;
+        // Hashear la contraseña proporcionada por el usuario con el salt recuperado
+        String hashedPassword = hashPassword(password, salt);
+
+        // Comparar el hash generado con el hash almacenado en la base de datos
+        if (hashedPassword.equals(usuario.getPasswordHash())) {
+            return usuario; // Autenticación exitosa
+        } else {
+            return null; // Contraseña incorrecta
+        }
     }
 
     /**
-     * Encripta una contraseña usando el algoritmo SHA-256.
-     * @param password La contraseña a encriptar.
-     * @return El hash de la contraseña en formato hexadecimal.
+     * Registra un nuevo usuario en el sistema.
+     * Genera un salt y un hash para la contraseña antes de guardarlo.
+     *
+     * @param username El nombre de usuario.
+     * @param password La contraseña en texto plano.
+     * @param rol El rol del usuario (ej. "empleado", "admin").
+     * @return El objeto Usuario creado.
+     * @throws SQLException Si ocurre un error al acceder a la base de datos.
+     * @throws NoSuchAlgorithmException Si el algoritmo de hash (SHA-256) no está disponible.
+     */
+    public Usuario registrarUsuario(String username, String password, String rol) throws SQLException, NoSuchAlgorithmException {
+        // Generar un salt aleatorio
+        String salt = generateSalt();
+        
+        // Hashear la contraseña con el salt generado
+        String hashedPassword = hashPassword(password, salt);
+        
+        // Crear el objeto Usuario con los hashes y salt
+        Usuario nuevoUsuario = new Usuario(username, hashedPassword, salt, rol);
+        
+        // Guardar el usuario en la base de datos
+        usuarioDAO.guardar(nuevoUsuario);
+        
+        return nuevoUsuario;
+    }
+
+    /**
+     * Genera un salt aleatorio de 16 bytes.
+     * @return El salt codificado en Base64 como String.
+     * @throws NoSuchAlgorithmException Si el generador de números aleatorios no está disponible.
+     */
+    private String generateSalt() throws NoSuchAlgorithmException {
+        SecureRandom random = SecureRandom.getInstanceStrong();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        return Base64.getEncoder().encodeToString(salt); // Codifica el salt a Base64 para almacenarlo como String
+    }
+
+    /**
+     * Hashea una contraseña usando SHA-256 con un salt.
+     * @param password La contraseña en texto plano.
+     * @param salt La cadena salt (en formato Base64).
+     * @return El hash de la contraseña codificado en hexadecimal.
      * @throws NoSuchAlgorithmException Si el algoritmo SHA-256 no está disponible.
      */
-    private String encriptarPassword(String password) throws NoSuchAlgorithmException {
+    private String hashPassword(String password, String salt) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(password.getBytes());
-        byte[] bytes = md.digest();
+        md.update(Base64.getDecoder().decode(salt)); // Decodifica el salt de Base64
+        byte[] hashedPassword = md.digest(password.getBytes());
+        
+        // Convierte el array de bytes a una representación hexadecimal
         StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
+        for (byte b : hashedPassword) {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
+    }
+    
+    // --- TEMPORARY MAIN METHOD FOR REGISTRATION ---
+    public static void main(String[] args) {
+        ServicioAuth authService = new ServicioAuth();
+        try {
+            // Registra un usuario 'testadmin' con contraseña 'testpass' y rol 'admin'
+            // Puedes cambiar 'testadmin' y 'testpass' a lo que quieras.
+            Usuario newUser = authService.registrarUsuario("testadmin", "testpass", "admin");
+            System.out.println("Usuario '" + newUser.getUsername() + "' registrado con éxito con ID: " + newUser.getId());
+            System.out.println("Por favor, usa 'testadmin' y 'testpass' para iniciar sesión.");
+        } catch (SQLException | NoSuchAlgorithmException e) {
+            System.err.println("Error al registrar usuario: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

@@ -74,6 +74,7 @@ public class GestionarProductosUI extends javax.swing.JFrame {
         txtStock = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Gestionar productos");
 
         tblProductos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {

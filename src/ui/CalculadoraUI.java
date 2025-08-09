@@ -159,6 +159,9 @@ public class CalculadoraUI extends javax.swing.JFrame {
         btnResultado = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Calculadora");
+
+        jPanel1.setToolTipText("");
 
         btn8.setText("8");
         btn8.addActionListener(new java.awt.event.ActionListener() {

@@ -109,6 +109,7 @@ public class RealizarVentaUI extends javax.swing.JFrame {
         btnQuitarDelCarrito = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Realizar venta");
 
         tblProductos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {

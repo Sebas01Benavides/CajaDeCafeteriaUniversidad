@@ -1,10 +1,12 @@
 package ui;
 import dominio.Producto;
+import dominio.Usuario; 
 import servicio.ProductoServicio;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.JOptionPane;
+import java.time.LocalDateTime; // Importación necesaria para manejar LocalDateTime
+;
 
 /**
  *
@@ -12,42 +14,38 @@ import javax.swing.JOptionPane;
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
         private ProductoServicio productoServicio;
+        private Usuario usuarioLogueado; // Para almacenar el objeto Usuario completo
 
     /**
      * Creates new form VentanaPrincipal
      */
-    public VentanaPrincipal(String nombreUsuario) {
+    public VentanaPrincipal(Usuario usuario) {
         initComponents();
         setLocationRelativeTo(null);
-        this.nombreUsuario = nombreUsuario;
+        this.usuarioLogueado = usuario; 
         this.productoServicio = new ProductoServicio();
         cargarProductosEnTabla();
-
     }
-    
-    private String nombreUsuario;
     
     private void cargarProductosEnTabla() {
         try {
             List<Producto> productos = productoServicio.listarTodos(); // Usa listarTodos()
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            DefaultTableModel model = (DefaultTableModel) tblProductos.getModel();
             model.setRowCount(0); // Limpiar la tabla
             
-            // Asignar nombres a las columnas (si el modelo por defecto no los tiene)
-            model.setColumnIdentifiers(new Object[]{"ID", "Nombre", "Precio", "Activo", "Stock"}); // Agregado "Activo" y "Stock"
-            
+            // Asignar nombres a las columnas
+            model.setColumnIdentifiers(new Object[]{"ID", "Nombre", "Precio", "Activo", "Stock"}); 
             for (Producto producto : productos) {
                 model.addRow(new Object[]{
                     producto.getId(),
                     producto.getNombre(),
                     producto.getPrecio(),
-                    producto.isActivo(), // Asumiendo que quieres mostrar el estado activo
-                    producto.getStock()  // Ahora el método getStock() existirá
+                    producto.isActivo(), 
+                    producto.getStock() 
                 });
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al cargar los productos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace(); // Para depuración
         }
     }
     
@@ -59,7 +57,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         try {
             // Se asume que ProductoServicio tendrá un método para buscar por nombre
             List<Producto> productos = productoServicio.buscarPorNombre(nombre); 
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+            DefaultTableModel model = (DefaultTableModel) tblProductos.getModel();
             model.setRowCount(0); // Limpiar la tabla
             
             for (Producto producto : productos) {
@@ -86,7 +84,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblProductos = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         txtNombreProducto = new javax.swing.JTextField();
         btnBuscarProducto = new javax.swing.JButton();
@@ -94,22 +92,21 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jMenuArchivo = new javax.swing.JMenu();
         jMenu5 = new javax.swing.JMenu();
         jMenuProducto = new javax.swing.JMenu();
-        jMenuGestionarProductos = new javax.swing.JMenu();
+        jMenuItemGestionarProductos = new javax.swing.JMenuItem();
         jMenuVentas = new javax.swing.JMenu();
-        jMenuRealizarVenta = new javax.swing.JMenu();
-        jMenuConsultarVentas = new javax.swing.JMenu();
-        jMenuGenerarFactura = new javax.swing.JMenu();
+        jMenuItemRealizarVenta = new javax.swing.JMenuItem();
+        jMenuItemConsultarVenta = new javax.swing.JMenuItem();
+        jMenuItemGenerarFactura = new javax.swing.JMenuItem();
         jMenuHerramientas = new javax.swing.JMenu();
-        jMenuCalculadora = new javax.swing.JMenu();
-        jMenuImprimirTicket = new javax.swing.JMenu();
+        jMenuItemCalculadora = new javax.swing.JMenuItem();
         jMenuAyuda = new javax.swing.JMenu();
-        jMenuContacto = new javax.swing.JMenu();
-        jMenuAcercaDe = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sistema Cafeteria");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblProductos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -120,7 +117,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblProductos);
 
         jLabel1.setText("Consultar producto según nombre");
 
@@ -140,66 +137,78 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
         jMenuProducto.setText("Producto");
 
-        jMenuGestionarProductos.setText("Gestionar productos");
-        jMenuGestionarProductos.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItemGestionarProductos.setText("Gestionar productos");
+        jMenuItemGestionarProductos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuGestionarProductosActionPerformed(evt);
+                jMenuItemGestionarProductosActionPerformed(evt);
             }
         });
-        jMenuProducto.add(jMenuGestionarProductos);
+        jMenuProducto.add(jMenuItemGestionarProductos);
 
         jMenuBarGestionarProductos.add(jMenuProducto);
 
         jMenuVentas.setText("Ventas");
-
-        jMenuRealizarVenta.setText("Realizar venta");
-        jMenuRealizarVenta.addActionListener(new java.awt.event.ActionListener() {
+        jMenuVentas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuRealizarVentaActionPerformed(evt);
+                jMenuVentasActionPerformed(evt);
             }
         });
-        jMenuVentas.add(jMenuRealizarVenta);
 
-        jMenuConsultarVentas.setText("Consultar ventas");
-        jMenuConsultarVentas.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItemRealizarVenta.setText("Realizar venta");
+        jMenuItemRealizarVenta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuConsultarVentasActionPerformed(evt);
+                jMenuItemRealizarVentaActionPerformed(evt);
             }
         });
-        jMenuVentas.add(jMenuConsultarVentas);
+        jMenuVentas.add(jMenuItemRealizarVenta);
 
-        jMenuGenerarFactura.setText("Generar factura");
-        jMenuVentas.add(jMenuGenerarFactura);
+        jMenuItemConsultarVenta.setText("Consultar ventas");
+        jMenuItemConsultarVenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemConsultarVentaActionPerformed(evt);
+            }
+        });
+        jMenuVentas.add(jMenuItemConsultarVenta);
+
+        jMenuItemGenerarFactura.setText("generarfactura");
+        jMenuItemGenerarFactura.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemGenerarFacturaActionPerformed(evt);
+            }
+        });
+        jMenuVentas.add(jMenuItemGenerarFactura);
 
         jMenuBarGestionarProductos.add(jMenuVentas);
 
         jMenuHerramientas.setText("Herramientas");
 
-        jMenuCalculadora.setText("Calculadora");
-        jMenuCalculadora.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItemCalculadora.setText("Calculadora");
+        jMenuItemCalculadora.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuCalculadoraActionPerformed(evt);
+                jMenuItemCalculadoraActionPerformed(evt);
             }
         });
-        jMenuHerramientas.add(jMenuCalculadora);
-
-        jMenuImprimirTicket.setText("jMenu1");
-        jMenuHerramientas.add(jMenuImprimirTicket);
+        jMenuHerramientas.add(jMenuItemCalculadora);
 
         jMenuBarGestionarProductos.add(jMenuHerramientas);
 
         jMenuAyuda.setText("Ayuda");
 
-        jMenuContacto.setText("Contacto");
-        jMenuContacto.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem1.setText("Contacto");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuContactoActionPerformed(evt);
+                jMenuItem1ActionPerformed(evt);
             }
         });
-        jMenuAyuda.add(jMenuContacto);
+        jMenuAyuda.add(jMenuItem1);
 
-        jMenuAcercaDe.setText("Acerca de");
-        jMenuAyuda.add(jMenuAcercaDe);
+        jMenuItem2.setText("Acerca de");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenuAyuda.add(jMenuItem2);
 
         jMenuBarGestionarProductos.add(jMenuAyuda);
 
@@ -212,12 +221,12 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             .addComponent(jScrollPane1)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(txtNombreProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29)
+                .addComponent(txtNombreProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 306, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(btnBuscarProducto)
-                .addContainerGap(270, Short.MAX_VALUE))
+                .addContainerGap(204, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -234,28 +243,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenuGestionarProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuGestionarProductosActionPerformed
-        GestionarProductosUI gestionarProductosUI = new GestionarProductosUI();
-        gestionarProductosUI.setVisible(true);
-    }//GEN-LAST:event_jMenuGestionarProductosActionPerformed
-
-    private void jMenuRealizarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuRealizarVentaActionPerformed
-        RealizarVentaUI realizarVentaUI = new RealizarVentaUI();
-        realizarVentaUI.setVisible(true);
-    }//GEN-LAST:event_jMenuRealizarVentaActionPerformed
-
-    private void jMenuCalculadoraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuCalculadoraActionPerformed
-        CalculadoraUI calculadoraUI = new CalculadoraUI();
-        calculadoraUI.setVisible(true);
-    }//GEN-LAST:event_jMenuCalculadoraActionPerformed
-
-    private void jMenuContactoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuContactoActionPerformed
-        JOptionPane.showMessageDialog
-        (this, "Para soporte, contacta a sebas01benavides@gmail.com",
-         "Contacto",
-         JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_jMenuContactoActionPerformed
-
     private void btnBuscarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarProductoActionPerformed
         String nombreABuscar = txtNombreProducto.getText();
         if (nombreABuscar.isEmpty()) {
@@ -265,10 +252,46 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnBuscarProductoActionPerformed
 
-    private void jMenuConsultarVentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuConsultarVentasActionPerformed
+    private void jMenuItemGestionarProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGestionarProductosActionPerformed
+        GestionarProductosUI gestionarProductosUI = new GestionarProductosUI();
+        gestionarProductosUI.setVisible(true);
+    }//GEN-LAST:event_jMenuItemGestionarProductosActionPerformed
+
+    private void jMenuVentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuVentasActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuVentasActionPerformed
+
+    private void jMenuItemGenerarFacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGenerarFacturaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItemGenerarFacturaActionPerformed
+
+    private void jMenuItemConsultarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemConsultarVentaActionPerformed
         ConsultarVentasUI consultarVentasUI = new ConsultarVentasUI();
         consultarVentasUI.setVisible(true);
-    }//GEN-LAST:event_jMenuConsultarVentasActionPerformed
+    }//GEN-LAST:event_jMenuItemConsultarVentaActionPerformed
+
+    private void jMenuItemRealizarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemRealizarVentaActionPerformed
+        RealizarVentaUI realizarVentaUI = new RealizarVentaUI();
+        realizarVentaUI.setVisible(true);
+    }//GEN-LAST:event_jMenuItemRealizarVentaActionPerformed
+
+    private void jMenuItemCalculadoraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCalculadoraActionPerformed
+        CalculadoraUI calculadoraUI = new CalculadoraUI();
+        calculadoraUI.setVisible(true);
+    }//GEN-LAST:event_jMenuItemCalculadoraActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        JOptionPane.showMessageDialog(this, "Para soporte, contacta a sebas01benavides@gmail.com",
+                 "Contacto",
+                 JOptionPane.INFORMATION_MESSAGE);    
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        JOptionPane.showMessageDialog(this, "Sistema caja para cafeteria univertisaria. Realizado por Sebastián Benavides",
+                 "Acerca de",
+                 JOptionPane.INFORMATION_MESSAGE);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -308,22 +331,21 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton btnBuscarProducto;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu5;
-    private javax.swing.JMenu jMenuAcercaDe;
     private javax.swing.JMenu jMenuArchivo;
     private javax.swing.JMenu jMenuAyuda;
     private javax.swing.JMenuBar jMenuBarGestionarProductos;
-    private javax.swing.JMenu jMenuCalculadora;
-    private javax.swing.JMenu jMenuConsultarVentas;
-    private javax.swing.JMenu jMenuContacto;
-    private javax.swing.JMenu jMenuGenerarFactura;
-    private javax.swing.JMenu jMenuGestionarProductos;
     private javax.swing.JMenu jMenuHerramientas;
-    private javax.swing.JMenu jMenuImprimirTicket;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItemCalculadora;
+    private javax.swing.JMenuItem jMenuItemConsultarVenta;
+    private javax.swing.JMenuItem jMenuItemGenerarFactura;
+    private javax.swing.JMenuItem jMenuItemGestionarProductos;
+    private javax.swing.JMenuItem jMenuItemRealizarVenta;
     private javax.swing.JMenu jMenuProducto;
-    private javax.swing.JMenu jMenuRealizarVenta;
     private javax.swing.JMenu jMenuVentas;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tblProductos;
     private javax.swing.JTextField txtNombreProducto;
     // End of variables declaration//GEN-END:variables
 }

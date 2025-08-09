@@ -23,7 +23,7 @@ public class LoginUI extends javax.swing.JFrame {
     }
     private void login() {
         String username = txtUsername.getText();
-        // Usar getPassword() y convertirlo a String, JPasswordField recomienda no usar getText()
+        // Usar getPassword() y convertirlo a String es la forma recomendada para JPasswordField
         String password = new String(txtPassword.getPassword()); 
 
         if (username.isEmpty() || password.isEmpty()) {
@@ -38,20 +38,18 @@ public class LoginUI extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Bienvenido, " + usuario.getUsername(), "Ingreso Exitoso", JOptionPane.INFORMATION_MESSAGE);
                 this.dispose(); // Cerrar la ventana de login
                 
-                // Abrir la ventana principal y pasar el usuario autenticado
-                VentanaPrincipal principal = new VentanaPrincipal(usuario.getUsername());
+                // Abre la ventana principal y pasa el objeto Usuario autenticado
+                VentanaPrincipal principal = new VentanaPrincipal(usuario); // <--- CAMBIO CLAVE
                 principal.setVisible(true);
-
 
             } else {
                 JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos.", "Error de Ingreso", JOptionPane.ERROR_MESSAGE);
             }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, "Error de conexión a la base de datos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace(); // Imprime el stack trace para depuración
+            ex.printStackTrace(); // Para depuración
         } catch (NoSuchAlgorithmException ex) {
             JOptionPane.showMessageDialog(this, "Error en la encriptación de la contraseña: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace(); // Imprime el stack trace para depuración
         }
     }
 
@@ -73,7 +71,7 @@ public class LoginUI extends javax.swing.JFrame {
         txtPassword = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Bienvenido");
+        setTitle("Bienvenido al inicio de sesión");
 
         btnCancelar.setText("Cancelar");
 
