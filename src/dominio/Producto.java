@@ -11,12 +11,13 @@ import java.util.Date;
  * @author Sebas
  */
 public class Producto {
-     private int id;
-     private String nombre;
-     private String descripcion;
-     private boolean activo;
-     private double precio;
-     private Date creado;
+    private int id;
+    private String nombre;
+    private String descripcion;
+    private boolean activo;
+    private double precio;
+    private Date creado;
+    public Producto() {}
 
     public Producto(String nombre, String descripcion, boolean activo, double precio, Date creado) {
         this.nombre = nombre;

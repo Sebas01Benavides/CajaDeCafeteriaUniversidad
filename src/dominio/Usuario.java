@@ -17,7 +17,9 @@ public class Usuario {
     private String rol;
     private boolean activo;
     private Date creado;
-
+    
+    public Usuario (){} //Constructor vacio
+    
     public Usuario(String username, String password, String rol) {
         this.username = username;
         this.password = password;
