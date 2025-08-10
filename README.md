@@ -1,5 +1,5 @@
 ☕ Caja de Cafetería Universitaria (Proyecto en Desarrollo)
-Bienvenido al sistema de gestión de Caja de Cafetería Universitaria Este es un proyecto de aplicación de escritorio en desarrollo, construido con Java Swing, diseñado para explorar y gestionar las operaciones básicas de una cafetería en un entorno universitario. Se enfoca en proporcionar un conjunto de capacidades fundamentales que pueden ser expandidas y mejoradas en el futuro.
+Bienvenido al sistema de gestión de  Caja de Cafetería Universitaria. Este es un proyecto de aplicación de escritorio en desarrollo, construido con Java Swing, diseñado para explorar y gestionar las operaciones básicas de una cafetería en un entorno universitario. Se enfoca en proporcionar un conjunto de capacidades fundamentales que pueden ser expandidas y mejoradas en el futuro.
 
 🚀 Funcionalidades Implementadas (Estado Actual)
 Este sistema ofrece las siguientes funcionalidades, que están en proceso de refinamiento y expansión:
@@ -78,14 +78,16 @@ Sigue estos pasos detallados para configurar el proyecto en tu máquina local. P
 git clone <URL_DEL_REPOSITORIO>
 cd CajaDeCafeteriaUniversitaria
 
+
 Si no usas Git, simplemente descarga y descomprime el archivo ZIP del proyecto.
 
 2. Configurar la Base de Datos PostgreSQL
 Crear la Base de Datos y Usuario: Conéctate a tu servidor PostgreSQL (usando pgAdmin, psql, o DBeaver) y ejecuta los siguientes comandos SQL para crear la base de datos y un usuario dedicado (ajusta los nombres y la contraseña):
 
-CREATE DATABASE cafeteria_db;
+CREATE DATABASE bdcafeteria;
 CREATE USER your_pg_user WITH PASSWORD 'your_pg_password';
-GRANT ALL PRIVILEGES ON DATABASE cafeteria_db TO your_pg_user;
+GRANT ALL PRIVILEGES ON DATABASE bdcafeteria TO your_pg_user;
+
 
 Crear el Esquema y Cargar Datos Iniciales:
 
@@ -95,13 +97,14 @@ Importante: Si este script no existe o no se ejecuta, la aplicación no encontra
 
 Puedes ejecutarlo así desde la línea de comandos (asegúrate de que psql esté en tu PATH):
 
-psql -U your_pg_user -d cafeteria_db -h localhost -p 5432 -f path/to/Database_Creation_SQL_Script.sql
+psql -U your_pg_user -d bdcafeteria -h localhost -p 5432 -f path/to/Database_Creation_SQL_Script.sql
+
 
 Configurar la Conexión en Java:
 
 Abre el archivo infraestructura/ConexionBD.java.
 
-Asegúrate de que las constantes DB_URL, USER, y PASS coincidan exactamente con la configuración de tu base de datos PostgreSQL (jdbc:postgresql://localhost:5432/cafeteria_db, your_pg_user, your_pg_password o los que hayas definido).
+Asegúrate de que las constantes DB_URL, USER, y PASS coincidan exactamente con la configuración de tu base de datos PostgreSQL (jdbc:postgresql://localhost:5432/bdcafeteria, your_pg_user, your_pg_password o los que hayas definido).
 
 3. Añadir la Librería JTattoo a NetBeans (¡Paso Fundamental!)
 Una configuración incorrecta de esta librería es una causa común de que el tema no se aplique.
@@ -150,9 +153,10 @@ Es absolutamente crucial realizar copias de seguridad regulares de tu base de da
 Para realizar un backup desde la línea de comandos:
 pg_dump -U <usuario_db> -h <host_db> -p <puerto_db> <nombre_db> > /ruta/donde/guardar/tu_backup_nombre_fecha.sql
 
+
 Ejemplo Práctico:
 
-pg_dump -U your_pg_user -h localhost -p 5432 cafeteria_db > C:/backups/cafeteria_db_20250809.sql
+pg_dump -U your_pg_user -h localhost -p 5432 bdcafeteria > C:/backups/bdcafeteria_20250809.sql
 
 Este comando creará un archivo SQL que contiene la estructura y los datos de tu base de datos. Puedes usar psql para restaurarlo en caso de necesidad.
 
