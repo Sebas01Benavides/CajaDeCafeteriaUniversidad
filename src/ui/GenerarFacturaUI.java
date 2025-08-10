@@ -3,9 +3,14 @@ import dominio.Venta;
 import dominio.DetalleVenta;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.BorderLayout;
-import java.awt.Font;
+import java.awt.BorderLayout; // Importación no usada, se puede eliminar si no se usa en el diseño manual
+import java.awt.Font;         // Importación no usada, se puede eliminar si no se usa en el diseño manual
 import java.time.format.DateTimeFormatter;
+import java.io.FileWriter;     // Para escribir en archivos
+import java.io.BufferedWriter; // Para escribir de forma eficiente
+import java.io.IOException;    // Para manejar excepciones de I/O
+import javax.swing.filechooser.FileNameExtensionFilter; // Para filtrar tipos de archivo
+
 /**
  *
  * @author Sebas
@@ -74,11 +79,11 @@ public class GenerarFacturaUI extends JDialog {
 
             },
             new String [] {
-                "Producto", "Cantidad", "Precio"
+                "Producto", "Cantidad", "Precio", "Total línea"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                false, false, false, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -100,6 +105,11 @@ public class GenerarFacturaUI extends JDialog {
         lblDescuento.setText("Descuento");
 
         btnImprimirFactura.setText("Imprimir factura");
+        btnImprimirFactura.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnImprimirFacturaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -111,14 +121,15 @@ public class GenerarFacturaUI extends JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblIVA, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblIVI, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblSubtotal, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnImprimirFactura, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(19, 19, 19))))
@@ -136,11 +147,12 @@ public class GenerarFacturaUI extends JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblDescuento)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblSubtotal)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblTotal)
-                    .addComponent(btnImprimirFactura))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblSubtotal)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblTotal))
+                    .addComponent(btnImprimirFactura, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 60, Short.MAX_VALUE))
         );
 
@@ -159,6 +171,68 @@ public class GenerarFacturaUI extends JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnImprimirFacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImprimirFacturaActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar Factura como Archivo de Texto");
+        // Establecer un filtro para archivos .txt
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos de Texto (*.txt)", "txt");
+        fileChooser.setFileFilter(filter);
+        fileChooser.setSelectedFile(new java.io.File("Factura_Venta_" + venta.getId() + ".txt")); // Nombre de archivo por defecto
+
+        int userSelection = fileChooser.showSaveDialog(this);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            java.io.File fileToSave = fileChooser.getSelectedFile();
+            // Asegurarse de que el archivo tenga la extensión .txt
+            String filePath = fileToSave.getAbsolutePath();
+            if (!filePath.toLowerCase().endsWith(".txt")) {
+                fileToSave = new java.io.File(filePath + ".txt");
+            }
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileToSave))) {
+                // Escribir el encabezado de la factura
+                writer.write("-------------------------------------\n");
+                writer.write("         FACTURA DE VENTA\n");
+                writer.write("-------------------------------------\n");
+                writer.write("ID de Venta: " + venta.getId() + "\n");
+                writer.write(lblFecha.getText() + "\n");
+                writer.write("Usuario: " + (venta.getUserId() != 0 ? venta.getUserId() : "N/A") + "\n"); // Si el UserID no es String, ajusta esto
+                writer.write("-------------------------------------\n");
+                writer.write(String.format("%-20s %-10s %-15s %-15s\n", "Producto", "Cant.", "P. Unit.", "Total"));
+                writer.write("-------------------------------------\n");
+
+                // Escribir los detalles de la venta desde la tabla
+                DefaultTableModel model = (DefaultTableModel) tblDetalles.getModel();
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    String producto = model.getValueAt(i, 0).toString();
+                    String cantidad = model.getValueAt(i, 1).toString();
+                    String precioUnit = model.getValueAt(i, 2).toString();
+                    String totalLinea = model.getValueAt(i, 3).toString();
+                    writer.write(String.format("%-20s %-10s %-15s %-15s\n", producto, cantidad, precioUnit, totalLinea));
+                }
+                writer.write("-------------------------------------\n");
+
+                // Escribir los totales
+                writer.write(lblSubtotal.getText() + "\n");
+                writer.write(lblIVA.getText() + "\n");
+                writer.write(lblIVI.getText() + "\n");
+                writer.write(lblDescuento.getText() + "\n");
+                writer.write(lblTotal.getText() + "\n");
+                writer.write("-------------------------------------\n");
+                writer.write("       ¡Gracias por su compra!\n");
+                writer.write("-------------------------------------\n");
+
+                JOptionPane.showMessageDialog(this, "Factura guardada exitosamente en:\n" + fileToSave.getAbsolutePath(), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Error al guardar la factura: " + e.getMessage(), "Error de E/S", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error inesperado al generar la factura: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_btnImprimirFacturaActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnImprimirFactura;
