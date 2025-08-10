@@ -96,7 +96,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jMenuVentas = new javax.swing.JMenu();
         jMenuItemRealizarVenta = new javax.swing.JMenuItem();
         jMenuItemConsultarVenta = new javax.swing.JMenuItem();
-        jMenuItemGenerarFactura = new javax.swing.JMenuItem();
         jMenuHerramientas = new javax.swing.JMenu();
         jMenuItemCalculadora = new javax.swing.JMenuItem();
         jMenuAyuda = new javax.swing.JMenu();
@@ -178,14 +177,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         });
         jMenuVentas.add(jMenuItemConsultarVenta);
 
-        jMenuItemGenerarFactura.setText("generarfactura");
-        jMenuItemGenerarFactura.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemGenerarFacturaActionPerformed(evt);
-            }
-        });
-        jMenuVentas.add(jMenuItemGenerarFactura);
-
         jMenuBarGestionarProductos.add(jMenuVentas);
 
         jMenuHerramientas.setText("Herramientas");
@@ -226,26 +217,25 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 836, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(txtNombreProducto, javax.swing.GroupLayout.PREFERRED_SIZE, 306, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnBuscarProducto)
-                .addContainerGap(204, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txtNombreProducto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnBuscarProducto))
-                .addGap(0, 246, Short.MAX_VALUE))
+                .addGap(33, 33, 33))
         );
 
         pack();
@@ -268,10 +258,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private void jMenuVentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuVentasActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jMenuVentasActionPerformed
-
-    private void jMenuItemGenerarFacturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGenerarFacturaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItemGenerarFacturaActionPerformed
 
     private void jMenuItemConsultarVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemConsultarVentaActionPerformed
         ConsultarVentasUI consultarVentasUI = new ConsultarVentasUI();
@@ -347,7 +333,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItemCalculadora;
     private javax.swing.JMenuItem jMenuItemConsultarVenta;
-    private javax.swing.JMenuItem jMenuItemGenerarFactura;
     private javax.swing.JMenuItem jMenuItemGestionarProductos;
     private javax.swing.JMenuItem jMenuItemRealizarVenta;
     private javax.swing.JMenu jMenuProducto;

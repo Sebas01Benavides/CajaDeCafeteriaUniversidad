@@ -1,4 +1,5 @@
 package ui;
+import com.jtattoo.plaf.hifi.HiFiLookAndFeel;
 import servicio.ServicioAuth;
 import dominio.Usuario;
 import javax.swing.*;
@@ -6,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author Sebas
@@ -167,33 +170,29 @@ public class LoginUI extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LoginUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LoginUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LoginUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(LoginUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                // Añadir un mensaje de depuración antes de intentar establecer el L&F
+                System.out.println("DEBUG: Intentando establecer HiFiLookAndFeel...");
+                try {
+                    // Intenta establecer el Look and Feel de HiFi
+                    UIManager.setLookAndFeel(new HiFiLookAndFeel());
+                    System.out.println("DEBUG: HiFiLookAndFeel aplicado con éxito."); // Mensaje de éxito
+                } catch (UnsupportedLookAndFeelException ex) {
+                    // Si falla, registra el error y muestra un mensaje en la consola
+                    Logger.getLogger(LoginUI.class.getName()).log(Level.SEVERE, null, ex);
+                    System.err.println("ERROR: No se pudo aplicar HiFiLookAndFeel. Detalles: " + ex.getMessage());
+                    // Opcional: podrías intentar establecer el Look and Feel del sistema aquí
+                    System.out.println("DEBUG: Intentando aplicar LookAndFeel del sistema...");
+                    try {
+                        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                        System.out.println("DEBUG: LookAndFeel del sistema aplicado.");
+                    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException innerEx) {
+                        Logger.getLogger(LoginUI.class.getName()).log(Level.SEVERE, null, innerEx);
+                        System.err.println("ERROR: No se pudo aplicar LookAndFeel del sistema. Detalles: " + innerEx.getMessage());
+                    }
+                }
                 new LoginUI().setVisible(true);
             }
         });

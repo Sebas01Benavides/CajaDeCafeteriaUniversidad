@@ -64,8 +64,8 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="103" alignment="0" groupAlignment="0" max="-2" attributes="0">
                                   <Component id="btn3" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="btn9" alignment="0" min="-2" pref="73" max="-2" attributes="0"/>
-                                  <Component id="btn6" alignment="0" min="-2" pref="70" max="-2" attributes="0"/>
+                                  <Component id="btn9" alignment="0" pref="73" max="32767" attributes="0"/>
+                                  <Component id="btn6" alignment="0" max="32767" attributes="0"/>
                               </Group>
                               <Component id="btnDivision" alignment="0" min="-2" pref="73" max="-2" attributes="0"/>
                           </Group>
@@ -241,6 +241,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Del"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnBorrarActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnSuma">
           <Properties>
@@ -254,6 +257,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="/"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDivisionActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btnMultiplicacion">
           <Properties>
@@ -275,6 +281,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="="/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnResultadoActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

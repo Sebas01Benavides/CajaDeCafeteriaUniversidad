@@ -24,6 +24,7 @@ public class RealizarVentaUI extends javax.swing.JFrame {
      */
     public RealizarVentaUI() {
         initComponents();
+        setLocationRelativeTo(null);
         this.productoServicio = new ProductoServicio();
         this.ventaServicio = new VentaServicio();
         this.carrito = new ArrayList<>();

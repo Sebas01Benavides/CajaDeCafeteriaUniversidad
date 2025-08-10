@@ -58,7 +58,7 @@ public class CalculadoraUI extends javax.swing.JFrame {
             case "-":
                 result = firstNumber - secondNumber;
                 break;
-            case "*":
+            case "x":
                 result = firstNumber * secondNumber;
                 break;
             case "/":
@@ -242,6 +242,11 @@ public class CalculadoraUI extends javax.swing.JFrame {
         });
 
         btnBorrar.setText("Del");
+        btnBorrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBorrarActionPerformed(evt);
+            }
+        });
 
         btnSuma.setText("+");
         btnSuma.addActionListener(new java.awt.event.ActionListener() {
@@ -251,6 +256,11 @@ public class CalculadoraUI extends javax.swing.JFrame {
         });
 
         btnDivision.setText("/");
+        btnDivision.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDivisionActionPerformed(evt);
+            }
+        });
 
         btnMultiplicacion.setText("x");
         btnMultiplicacion.addActionListener(new java.awt.event.ActionListener() {
@@ -267,6 +277,11 @@ public class CalculadoraUI extends javax.swing.JFrame {
         });
 
         btnResultado.setText("=");
+        btnResultado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnResultadoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -292,8 +307,8 @@ public class CalculadoraUI extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(btn3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btn9, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btn6, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btn9, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
+                                .addComponent(btn6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(btnDivision, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -422,6 +437,30 @@ public class CalculadoraUI extends javax.swing.JFrame {
     private void btnMultiplicacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMultiplicacionActionPerformed
         operationButtonActionPerformed(evt);
     }//GEN-LAST:event_btnMultiplicacionActionPerformed
+
+    private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrarActionPerformed
+        txtCalculadora.setText("0"); // Restablece la pantalla a 0
+        startNewNumber = true; // Prepara la pantalla para un nuevo número
+        firstNumber = 0;         // Reinicia el primer número
+        currentOperator = "";    // Reinicia el operador
+        decimalAdded = false;    // Reinicia bandera de decimal
+    }//GEN-LAST:event_btnBorrarActionPerformed
+
+    private void btnResultadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResultadoActionPerformed
+        if (txtCalculadora.getText().equals("Error")) {
+            return; // No hacer nada si está en error
+        }
+        if (!currentOperator.isEmpty()) {
+            performCalculation();
+        }
+        startNewNumber = true; // Después de un resultado, la siguiente entrada iniciará un nuevo número
+        decimalAdded = false; // Resetear la bandera de decimal
+        currentOperator = ""; // Asegurarse de que el operador se borre para evitar cálculos repetidos
+    }//GEN-LAST:event_btnResultadoActionPerformed
+
+    private void btnDivisionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDivisionActionPerformed
+        operationButtonActionPerformed(evt);
+    }//GEN-LAST:event_btnDivisionActionPerformed
 
     /**
      * @param args the command line arguments
